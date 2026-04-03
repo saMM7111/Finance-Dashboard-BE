@@ -32,9 +32,9 @@ The API securely integrates dynamic filtering, sorting, and analytical endpoint 
 
 ```mermaid
 flowchart LR
-        C[Client or Frontend] --> A[Spring Boot API]
+        C[Client] --> A[Spring Boot API]
 
-        subgraph API_LAYER[API Layer]
+        subgraph "API Layer"
                 AC[AuthenticationController]
                 UC[UserController]
                 ACC[AccountController]
@@ -42,7 +42,7 @@ flowchart LR
                 CC[CategoryController]
         end
 
-        subgraph DOMAIN_SERVICES[Domain Services]
+        subgraph "Domain Services"
                 AS[AuthenticationService]
                 US[UserService]
                 ACS[AccountService]
@@ -51,7 +51,7 @@ flowchart LR
                 JS[JwtService]
         end
 
-        subgraph PERSISTENCE[Persistence]
+        subgraph "Persistence"
                 UR[UserRepository]
                 AR[AccountRepository]
                 RR[RecordRepository]
@@ -102,7 +102,7 @@ erDiagram
     long id
     string email
     string role
-    boolean active
+    boolean isActive
     string currency
   }
 
@@ -111,13 +111,13 @@ erDiagram
     string name
     double balance
     string currency
-    boolean includeInStatistic
+    boolean includedInStats
   }
 
   RECORD {
     long id
     double amount
-    date date
+    date recordDate
     string label
     string note
   }
