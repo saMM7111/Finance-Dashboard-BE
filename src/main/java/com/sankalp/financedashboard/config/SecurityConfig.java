@@ -37,11 +37,14 @@ public class SecurityConfig {
             "/",
             // authentication and registration endpoints
             "/auth/**",
+            "/api/auth/**",
             // documentation endpoints
             "/swagger-resources/**",
+            "/api/swagger-resources/**",
             "/swagger-ui/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**"
+            "/api/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api/v3/api-docs/**"
     };
 
     //paths, which require role ADMIN
