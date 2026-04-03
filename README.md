@@ -15,79 +15,102 @@ A layered Spring Boot backend for a finance dashboard domain with JWT authentica
 
 ```mermaid
 flowchart LR
-		C[Client or Frontend] --> A[Spring Boot API]
+	C[Client or Frontend] --> A[Spring Boot API]
 
-		subgraph API Layer
-				AC[AuthenticationController]
-				UC[UserController]
-				AccC[AccountController]
-				RC[RecordController]
-				CC[CategoryController]
-		end
+	subgraph API_LAYER[API Layer]
+		AC[AuthenticationController]
+		UC[UserController]
+		ACC[AccountController]
+		RC[RecordController]
+		CC[CategoryController]
+	end
 
-		subgraph Domain Services
-				AS[AuthenticationService]
-				US[UserService]
-				AccS[AccountService]
-				RS[RecordService]
-				CS[CategoryService]
-				JS[JwtService]
-		end
+	subgraph DOMAIN_SERVICES[Domain Services]
+		AS[AuthenticationService]
+		US[UserService]
+		ACS[AccountService]
+		RS[RecordService]
+		CS[CategoryService]
+		JS[JwtService]
+	end
 
-		subgraph Persistence
-				UR[UserRepository]
-				AR[AccountRepository]
-				RR[RecordRepository]
-				CR[CategoryRepository]
-		end
+	subgraph PERSISTENCE[Persistence]
+		UR[UserRepository]
+		AR[AccountRepository]
+		RR[RecordRepository]
+		CR[CategoryRepository]
+	end
 
-		DB[(MySQL)]
+	DB[(MySQL)]
 
-		A --> API Layer
-		API Layer --> Domain Services
-		Domain Services --> Persistence
-		Persistence --> DB
-		A --> JS
+	A --> AC
+	A --> UC
+	A --> ACC
+	A --> RC
+	A --> CC
+
+	AC --> AS
+	UC --> US
+	ACC --> ACS
+	RC --> RS
+	CC --> CS
+
+	AS --> UR
+	US --> UR
+	US --> AR
+	US --> RR
+	ACS --> AR
+	RS --> RR
+	RS --> AR
+	RS --> CR
+	CS --> CR
+
+	UR --> DB
+	AR --> DB
+	RR --> DB
+	CR --> DB
+
+	A --> JS
 ```
 
 ## Domain Model
 
 ```mermaid
 erDiagram
-		USER ||--o{ ACCOUNT : owns
-		ACCOUNT ||--o{ RECORD : contains
-		CATEGORY ||--o{ RECORD : classifies
+  USER ||--o{ ACCOUNT : owns
+  ACCOUNT ||--o{ RECORD : contains
+  CATEGORY ||--o{ RECORD : classifies
 
-		USER {
-				long id
-				string email
-				string role
-				boolean active
-				string currency
-		}
+  USER {
+    long id
+    string email
+    string role
+    boolean active
+    string currency
+  }
 
-		ACCOUNT {
-				long id
-				string name
-				double balance
-				string currency
-				bool includeInStatistic
-		}
+  ACCOUNT {
+    long id
+    string name
+    double balance
+    string currency
+    boolean includeInStatistic
+  }
 
-		RECORD {
-				long id
-				double amount
-				date date
-				string label
-				string note
-		}
+  RECORD {
+    long id
+    double amount
+    date date
+    string label
+    string note
+  }
 
-		CATEGORY {
-				long id
-				string name
-				string icon
-				string color
-		}
+  CATEGORY {
+    long id
+    string name
+    string icon
+    string color
+  }
 ```
 
 ## Security and Access Control
