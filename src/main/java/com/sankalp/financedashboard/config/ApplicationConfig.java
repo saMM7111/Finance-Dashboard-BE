@@ -74,7 +74,21 @@ public class ApplicationConfig {
                                 .title("Finance Dashboard")
                                 .version("1.0")
                                 .contact(contact())
-                                .description("Java backend REST API for Finance Dashboard")
+                                .description("""
+                                        ## RBAC Matrix
+                                        
+                                        | Area | ADMIN | ANALYST | USER |
+                                        | --- | --- | --- | --- |
+                                        | Users | Full management | No access | Self only for read, update, delete |
+                                        | Accounts | Full management | No access | Own accounts only |
+                                        | Records | Full read and write | Read all records only | Own records only |
+                                        | Categories | Full management + analytic | Read categories + analytic | Read categories + own analytic |
+                                        | Analytics and Summaries | Access any user | Access any user | Own data only |
+                                        
+                                        Notes:
+                                        - ANALYST is read-only and cannot create, update, or delete users, accounts, records, or categories.
+                                        - Authorities are stored as raw role names: ADMIN, ANALYST, USER.
+                                        """)
                              // .termsOfService("http://swagger.io/terms/")
                              // .license(new License().name("Apache 2.0").url("http://springdoc.org"))
                 )
