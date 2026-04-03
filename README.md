@@ -1,79 +1,96 @@
-# Finance Dashboard Backend
+# Finance Dashboard - Backend
 
-A layered Spring Boot backend for a finance dashboard domain with JWT authentication, role-based access control, analytics endpoints, validation, and MySQL persistence.
+[![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=flat&logo=java&logoColor=white&color=f1931c)](https://www.java.com/en/)
+[![Spring Boot](https://img.shields.io/badge/spring-%236DB33F.svg?style=flat&logo=spring&logoColor=white)](https://spring.io)
+[![Apache Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=flat&logo=Apache%20Maven&logoColor=white)](https://maven.apache.org)
+[![MySQL](https://img.shields.io/badge/MySQL-00000F?style=flat&logo=mysql&logoColor=white&color=3d6e93)](https://www.mysql.com)
+[![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=flat&logo=swagger&logoColor=white)](https://swagger.io)
+[![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=flat&logo=docker&logoColor=white)](https://www.docker.com)
 
-## What This Backend Demonstrates
+## 📝 Description
 
-- Clean controller-service-repository separation
-- RBAC with ownership checks (USER, ANALYST, ADMIN)
-- Transaction and analytics APIs in one service boundary
-- Input validation and centralized error handling
-- Dynamic filtering, pagination, and sorting for records
-- Dockerized deployment path for cloud platforms (Render)
+Finance Dashboard is an enterprise-grade RESTful API backend for **managing personal finances**. It allows users and analysts to securely categorize records, analyze income and expenses, and manage multiple financial accounts using stateless JWT authentication and role-based access control.
 
-## Architecture Overview
+The backend was completely written in **Java 17** using the **Spring Boot framework** and utilizes a MySQL database for scalable data persistence. The application acts as the data provider to a frontend application, securely connected via a robust REST API.
+
+## 🔗 Links
+
+- [🚀 Live API URL (Render)](https://finance-dashboard-be-1.onrender.com/api)
+- [📄 API documentation (Swagger)](https://finance-dashboard-be-1.onrender.com/api/swagger-ui/index.html)
+
+## ⚽️ Project Goals
+
+This project was created to **design a robust layered architecture** and to deploy scalable backend systems to modern cloud providers (Render & Railway). Additionally, I aimed to demonstrate enterprise-level capabilities such as RBAC (Role-Based Access Control) matrix validation, JWT authentication, centralized exception handling, and automated API documentation.
+
+## 🏗️ Realization
+
+I developed the **backend** in **Java 17** and the **Spring Boot** framework, choosing a robust MySQL database for data persistence. The application utilizes a highly separated **MVC architecture** (Controller-Service-Repository). The database and the backend app are containerized to run in **Docker** via multi-stage builds. Authentication and authorization strictly enforce security rules through **JWT tokens** natively relying on **Spring Security**. 
+
+The API securely integrates dynamic filtering, sorting, and analytical endpoint processing. It also automatically generates interactive **OpenApi (Swagger)** documentation based on the codebase.
+
+### Architecture Overview
 
 ```mermaid
 flowchart LR
-	C[Client or Frontend] --> A[Spring Boot API]
+        C[Client or Frontend] --> A[Spring Boot API]
 
-	subgraph API_LAYER[API Layer]
-		AC[AuthenticationController]
-		UC[UserController]
-		ACC[AccountController]
-		RC[RecordController]
-		CC[CategoryController]
-	end
+        subgraph API_LAYER[API Layer]
+                AC[AuthenticationController]
+                UC[UserController]
+                ACC[AccountController]
+                RC[RecordController]
+                CC[CategoryController]
+        end
 
-	subgraph DOMAIN_SERVICES[Domain Services]
-		AS[AuthenticationService]
-		US[UserService]
-		ACS[AccountService]
-		RS[RecordService]
-		CS[CategoryService]
-		JS[JwtService]
-	end
+        subgraph DOMAIN_SERVICES[Domain Services]
+                AS[AuthenticationService]
+                US[UserService]
+                ACS[AccountService]
+                RS[RecordService]
+                CS[CategoryService]
+                JS[JwtService]
+        end
 
-	subgraph PERSISTENCE[Persistence]
-		UR[UserRepository]
-		AR[AccountRepository]
-		RR[RecordRepository]
-		CR[CategoryRepository]
-	end
+        subgraph PERSISTENCE[Persistence]
+                UR[UserRepository]
+                AR[AccountRepository]
+                RR[RecordRepository]
+                CR[CategoryRepository]
+        end
 
-	DB[(MySQL)]
+        DB[(MySQL)]
 
-	A --> AC
-	A --> UC
-	A --> ACC
-	A --> RC
-	A --> CC
+        A --> AC
+        A --> UC
+        A --> ACC
+        A --> RC
+        A --> CC
 
-	AC --> AS
-	UC --> US
-	ACC --> ACS
-	RC --> RS
-	CC --> CS
+        AC --> AS
+        UC --> US
+        ACC --> ACS
+        RC --> RS
+        CC --> CS
 
-	AS --> UR
-	US --> UR
-	US --> AR
-	US --> RR
-	ACS --> AR
-	RS --> RR
-	RS --> AR
-	RS --> CR
-	CS --> CR
+        AS --> UR
+        US --> UR
+        US --> AR
+        US --> RR
+        ACS --> AR
+        RS --> RR
+        RS --> AR
+        RS --> CR
+        CS --> CR
 
-	UR --> DB
-	AR --> DB
-	RR --> DB
-	CR --> DB
+        UR --> DB
+        AR --> DB
+        RR --> DB
+        CR --> DB
 
-	A --> JS
+        A --> JS
 ```
 
-## Domain Model
+### Domain Model
 
 ```mermaid
 erDiagram
@@ -113,238 +130,74 @@ erDiagram
   }
 ```
 
-## Security and Access Control
+## 🚀 Features
 
-### Roles
+- **Role-based Authentication:** Enforces permissions via `USER`, `ANALYST`, and `ADMIN` roles.
+- **Multiple financial accounts:** Manage boundaries between different account ledgers.
+- **Dynamic Categorization:** Add expense/income records safely mapped to personal categories.
+- **Granular Data Analytics:** Analytical calculation of incomes, expenses, categories, and balance evolution.
+- **Centralized Validation & Exception Handling:** Strict `400/401/403/404` customized error payloads via `@RestControllerAdvice`.
+- **Advanced Filtering/Sorting:** Dynamically retrieve records via specifications (`dateGe`, `amountGt`, `categoryId`).
 
-- USER
-- ANALYST
-- ADMIN
+## 🧑‍🔬 Technologies
 
-### RBAC Matrix
+- [Java 17](https://www.java.com/en/)
+- [Spring Boot 3.0.2](https://spring.io)
+- [Maven](https://maven.apache.org)
+- [Docker](https://www.docker.com)
+- [MySQL](https://www.mysql.com)
+- [Spring Security (JWT)](https://spring.io/projects/spring-security)
+- [Springdoc OpenAPI](https://swagger.io/)
 
-| Area | USER | ANALYST | ADMIN |
-|---|---|---|---|
-| Authentication | register + login | login | register + login |
-| Users | self read/update/delete | no write access | full |
-| Accounts | own accounts | read-only scope by policy | full |
-| Records | own records CRUD | read records + analytics | full |
-| Categories | read + own analytics context | read + analytics | full |
-| Analytics | own | all users | all users |
+## 😁 Conclusion
 
-### Important Security Notes
+This backend rapidly evolved into a scalable and enterprise-like service payload. I gained advanced architectural knowledge regarding **JWT Stateless Filtering**, enforcing environment overrides dynamically using Spring Profiles (`dev` vs `prod`), resolving multi-stage **Docker** container configurations for deployment, and managing secure cloud environments connecting Render to decentralized managed database clusters on Railway.
 
-- JWT is required for protected endpoints.
-- User activity status is enforced at authentication filter level (`active = false` users are blocked).
-- CORS is currently configured for `http://localhost:8080` and should be updated for production frontend domains.
-- JWT secret is currently hardcoded in `JwtService` and should be externalized for production.
+## ✅ Software requirements
 
-## API Surface (High Level)
+- Java 17+
+- Maven wrapper (included)
+- Docker & Docker Compose (for local database setup)
 
-Base path: `/api`
+## 🎬 How to run
 
-### Public Endpoints
+### Clone repository
 
-- `GET /api` - server status
-- `POST /api/auth/register` - register user
-- `POST /api/auth/authenticate` - login and receive JWT
-- `GET /api/v3/api-docs` - OpenAPI document
-- `GET /api/swagger-ui/index.html` - Swagger UI
-
-### Protected Endpoints
-
-- Users
-	- `GET /api/users`
-	- `GET /api/users/{id}`
-	- `PUT /api/users/{id}`
-	- `DELETE /api/users/{id}`
-	- `GET /api/users/{id}/accounts`
-	- `GET /api/users/{id}/totalAnalytic`
-	- `GET /api/users/{id}/balanceEvolution`
-- Accounts
-	- `GET /api/accounts`
-	- `GET /api/accounts/{id}`
-	- `POST /api/accounts`
-	- `PUT /api/accounts/{id}`
-	- `DELETE /api/accounts/{id}`
-- Records
-	- `GET /api/records`
-	- `GET /api/records/{id}`
-	- `POST /api/records`
-	- `PUT /api/records/{id}`
-	- `DELETE /api/records/{id}`
-- Categories
-	- `GET /api/categories`
-	- `GET /api/categories/{id}`
-	- `POST /api/categories`
-	- `PUT /api/categories/{id}`
-	- `DELETE /api/categories/{id}`
-	- `GET /api/categories/analytic`
-
-### Record Filtering Support
-
-`GET /api/records` supports pageable and spec-based filters, including:
-
-- `label`, `note`
-- `dateGe`, `dateLt`
-- `accountId`, `categoryId`, `userId`
-- `amountGt`, `amountLt`
-
-## Error Handling
-
-Centralized error handling is implemented via `@RestControllerAdvice`.
-
-- `404` for missing domain entities
-- `400` for validation failures and illegal arguments
-- `401` for authentication-required flows
-- `403` for authorization failures
-
-Error payload structure:
-
-```json
-{
-	"status": "BAD_REQUEST",
-	"errors": {
-		"field": "message"
-	}
-}
+```bash
+git clone https://github.com/your-username/FinanceDashboard-BE.git
+cd FinanceDashboard-BE/
 ```
 
-## Tech Stack
-
-- Java 17
-- Spring Boot 3.0.2
-- Spring Web
-- Spring Data JPA
-- Spring Security + JWT
-- Hibernate Validator
-- MySQL (runtime)
-- H2 (tests)
-- springdoc OpenAPI
-- Maven Wrapper
-- Docker multi-stage build
-
-## Project Structure
-
-```text
-src/main/java/com/sankalp/financedashboard/
-	authentication/   # JWT filter and auth facade
-	config/           # Security, OpenAPI, seeders
-	controller/       # REST endpoints
-	dto/              # API contracts
-	entity/           # JPA domain model
-	error/            # Exceptions and handlers
-	repository/       # Data access
-	service/          # Business logic
-src/main/resources/
-	application.yml
-	application-dev.yml
-	application-prod.yml
-```
-
-## Run Locally
-
-### Prerequisites
-
-- JDK 17+
-- Docker (for MySQL)
-
-### 1) Start MySQL
+### Start database
 
 ```bash
 docker compose up -d db
 ```
 
-### 2) Run backend in dev profile
+### Start the app
 
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-```
+- Set the development environment. The app will connect to the local database.
+- Create the database schema by ensuring `./src/main/resources/application-dev.yml` contains `spring.jpa.hibernate.ddl-auto: update`.
+- Run the app (app will run and host the API base path at http://localhost:8000/api)
+    ```bash
+    ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+    ```
+    (On Windows: `.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"`)
 
-Windows PowerShell:
+- Seeded `dev` profile Users:
+  - `admin@gmail.com` / `12345678` (ADMIN)
+  - `analyst@gmail.com` / `12345678` (ANALYST)
 
-```powershell
-.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
-```
+- Swagger documentation of the running app can be found locally at:
+  http://localhost:8000/api/swagger-ui/index.html
 
-### 3) Verify service
+## 🎆 Endpoints Structure (High Level)
 
-- `http://localhost:8000/api`
-- `http://localhost:8000/api/v3/api-docs`
-- `http://localhost:8000/api/swagger-ui/index.html`
+Base path: `/api`
 
-### Dev Seed Users
+### Public Endpoints
+- `GET /api` - server status check
+- `POST /api/auth/register` - register a user
+- `POST /api/auth/authenticate` - login to retrieve JWT
 
-Under `dev` profile, these users are seeded if missing:
-
-- `admin@gmail.com` / `12345678` (ADMIN)
-- `analyst@gmail.com` / `12345678` (ANALYST)
-
-## Tests
-
-Run full suite:
-
-```bash
-./mvnw test
-```
-
-Tests cover:
-
-- Controllers
-- Services
-- Repositories
-- Security behavior
-
-## Deploy on Render (Docker)
-
-This repository includes a production Dockerfile.
-
-### Render Service Setup
-
-- Environment: `Docker`
-- Root directory: `.`
-- Dockerfile path: `Dockerfile`
-
-### Required Environment Variables
-
-- `PROD_DB_HOST`
-- `PROD_DB_PORT`
-- `PROD_DB_NAME`
-- `PROD_DB_USERNAME`
-- `PROD_DB_PASSWORD`
-
-### Recommended Runtime Variables
-
-- `SPRING_PROFILES_ACTIVE=prod`
-- `SPRING_JPA_HIBERNATE_DDL_AUTO=update` (bootstrap only if database is empty)
-
-After first successful schema creation, switch to:
-
-- `SPRING_JPA_HIBERNATE_DDL_AUTO=none`
-
-### Health Check
-
-Use:
-
-- `/api`
-
-## Production Hardening Checklist
-
-- Externalize JWT secret (do not hardcode)
-- Restrict and parameterize CORS origins
-- Add DB migration tool (Flyway or Liquibase)
-- Add structured logging and tracing
-- Add rate limiting
-- Add token refresh and rotation strategy
-- Add CI pipeline for test + container scan
-
-## Tradeoffs and Notes
-
-- Uses service-level authorization checks for ownership logic to keep controller layer thin.
-- Uses JPA and custom queries for analytics to balance readability and query power.
-- Uses dynamic query filtering for records to reduce endpoint explosion.
-- Current architecture is optimized for single-service clarity and can evolve toward modularization if domain grows.
-
----
-
-If you are reviewing this quickly: start with Swagger (`/api/swagger-ui/index.html`), test role behavior using seeded users, then inspect service-layer access checks and repository analytics queries.
+*All other domains (`/users`, `/accounts`, `/records`, `/categories`) require passing the JWT Token in the Authorization Header: `Bearer <token>`.*
