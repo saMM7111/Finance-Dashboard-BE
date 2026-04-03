@@ -14,7 +14,7 @@ public class FinanceDashboard {
     @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public String displayAppIsRunning() {
-        return "Moneybag BE is running";
+        return "Server is running";
     }
 
     public static void main(String[] args) {
