@@ -309,4 +309,52 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(responseContent));
     }
+
+    // --- ANALYST role tests ---
+
+    @Test
+    @WithMockUser(authorities = "ANALYST")
+    void testGetAllAnalyst() throws Exception {
+        // given - ANALYST should be denied by @Secured({"ADMIN"}) on getAll
+        when(accountService.getAll())
+                .thenThrow(AccessDeniedException.class);
+
+        // then
+        mockMvc
+                .perform(get(ROOT_URL))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ANALYST")
+    void testCreateAccountAnalyst() throws Exception {
+        // given - ANALYST should not be able to create accounts
+        String requestContent =
+                """
+                        {
+                            "name": "Savings",
+                            "currency": "USD",
+                            "balance": 999.0,
+                            "color": "#fff",
+                            "icon": "mdi-cash",
+                            "includeInStatistic": true,
+                            "userId": 43
+                        }""";
+
+        when(accountService.save(org.mockito.ArgumentMatchers.any(CreateAccountRequest.class)))
+                .thenThrow(AccessDeniedException.class);
+
+        // then
+        mockMvc
+                .perform(
+                        post(ROOT_URL)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestContent)
+                                .with(csrf())
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 }

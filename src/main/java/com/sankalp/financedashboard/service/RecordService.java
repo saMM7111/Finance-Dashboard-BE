@@ -43,7 +43,8 @@ public class RecordService {
     }
 
     /**
-     * Get all records. Support filtering, sorting and pagination.
+     * Get all records. Support filtering, sorting and pagination. Role ADMIN and ANALYST can
+     * access all records, role USER only records from their accounts.
      * @param pageable pagination specification (page, size, sort,...)
      * @param userId user id
      * @param specification filter parameters
@@ -53,15 +54,15 @@ public class RecordService {
     public Page<Record> getAllFilter(Specification<Record> specification, Pageable pageable, Long userId)
             throws UserNotFoundException {
         if (userId == null) {
-            authenticationService.ifNotAdminThrowAccessDenied();
+            authenticationService.ifNotAdminOrAnalystThrowAccessDenied();
         } else {
-            authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(userId);
+            authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
         }
         return recordRepository.findAll(specification, pageable);
     }
 
     /**
-     * Get record by id. Role ADMIN can access all records, role USER only theirs.
+     * Get record by id. Role ADMIN and ANALYST can access all records, role USER only theirs.
      * @param id record id
      * @return record of specified id
      * @throws RecordNotFoundException Record of specified id doesn't exist.
@@ -75,7 +76,7 @@ public class RecordService {
         if (optionalRecord.isEmpty()) {
             throw new RecordNotFoundException(id);
         }
-        authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(
+        authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(
                 optionalRecord.get().getAccount().getUser().getId());
 
         return optionalRecord.get();

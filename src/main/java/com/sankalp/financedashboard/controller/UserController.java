@@ -113,8 +113,8 @@ public class UserController {
     }
 
     /**
-     * Update user by id. Role ADMIN can update all users and can set role ADMIN to all users. Role USER can update
-     * only self and can't set role ADMIN.
+     * Update user by id. Role ADMIN can update all users and can set role ADMIN or ANALYST to all users. Role USER
+     * can update only self and can't set role ADMIN or ANALYST.
      * @param id user id
      * @param request user data (only fields, which will be changed)
      * @return updated user
@@ -125,8 +125,8 @@ public class UserController {
     @Operation(
             summary = "Update user by id.",
             description = "Update existing user by id, null or not provided fields are ignored. Role ADMIN can " +
-                    "update all users and can set role ADMIN to all users. Role USER can update only self and can't " +
-                    "set role ADMIN."
+                    "update all users and can set role ADMIN or ANALYST to all users. Role USER can update only self " +
+                    "and can't set role ADMIN or ANALYST."
     )
     public UserDto update(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest request)
             throws UserNotFoundException {
@@ -163,7 +163,7 @@ public class UserController {
 
     /**
      * Get total analytics (from accounts included in statistics) (incomes, expenses, cash flow...) of user. Role ADMIN
-     * can access the analytics of all users, role USER only of their accounts.
+     * and ANALYST can access the analytics of all users, role USER only of their accounts.
      * @param id user id
      * @param dateGe dateGe date greater or equal than (inclusive)
      * @param dateLt dateLt date lower than (exclusive)
@@ -174,7 +174,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Return total analytic of all accounts.",
-            description = "Role ADMIN can access the analytics of all users, role USER only of their accounts."
+            description = "Role ADMIN and ANALYST can access the analytics of all users, role USER only of their accounts."
     )
     public TotalAnalytic getTotalAnalytic(
             @PathVariable Long id,
@@ -186,7 +186,7 @@ public class UserController {
 
     /**
      * Get time series of balance evolution by user. Include only accounts, which are included in statistics. Role
-     * ADMIN can access the analytics of all users, role USER only of their accounts.
+     * ADMIN and ANALYST can access the analytics of all users, role USER only of their accounts.
      * @param id user id
      * @param dateGe dateGe dateGe date greater or equal than (inclusive)
      * @param dateLt dateLt date lower than (exclusive)
@@ -198,7 +198,7 @@ public class UserController {
     @Operation(
             summary = "Get time series of balance evolution by user. Include only accounts, which are included in " +
                     "statistics.",
-            description = "Role ADMIN can access the analytics of all users, role USER only of their accounts."
+            description = "Role ADMIN and ANALYST can access the analytics of all users, role USER only of their accounts."
     )
     public List<TimeSeriesEntry> getBalanceEvolution(
             @PathVariable Long id,

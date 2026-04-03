@@ -32,8 +32,32 @@ public class UserDto {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private Boolean active;
+
     @Size(min = 1, max = 40)
     private String currency;
 
     private List<Long> accountIds;
+
+    /**
+     * Backward-compatible constructor used by existing tests and call sites.
+     */
+    public UserDto(
+            Long id,
+            String firstName,
+            String lastName,
+            String email,
+            Role role,
+            String currency,
+            List<Long> accountIds
+    ) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = role;
+        this.active = true;
+        this.currency = currency;
+        this.accountIds = accountIds;
+    }
 }

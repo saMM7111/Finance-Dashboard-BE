@@ -3,6 +3,7 @@ package com.sankalp.financedashboard.service;
 import com.sankalp.financedashboard.dto.category.CategoryAnalyticDto;
 import com.sankalp.financedashboard.dto.category.CategoryDto;
 import com.sankalp.financedashboard.dto.category.CreateCategoryRequest;
+import com.sankalp.financedashboard.entity.Account;
 import com.sankalp.financedashboard.entity.Category;
 import com.sankalp.financedashboard.entity.CategoryAnalytic;
 import com.sankalp.financedashboard.entity.Record;
@@ -200,21 +201,47 @@ class CategoryServiceTest {
     @Test
     void categoriesToDtos() {
         // given
+        User user = User.builder()
+                .id(1L)
+                .accounts(new ArrayList<>())
+                .build();
+        Account account = Account.builder()
+                .id(1L)
+                .name("Current")
+                .currency("USD")
+                .balance(0.0)
+                .color("#6290ff")
+                .icon("mdi-cash")
+                .includeInStatistic(true)
+                .records(new ArrayList<>())
+                .user(user)
+                .build();
+        user.addAccount(account);
+        Date testDate = new GregorianCalendar(2024, Calendar.JANUARY, 1).getTime();
+
         Record apples = Record.builder()
                 .id(1L)
                 .label("apples")
+                .date(testDate)
+                .account(account)
                 .build();
         Record yogurts = Record.builder()
                 .id(2L)
                 .label("yogurts")
+                .date(testDate)
+                .account(account)
                 .build();
         Record dividends = Record.builder()
                 .id(45L)
                 .label("dividends")
+                .date(testDate)
+                .account(account)
                 .build();
         Record salary = Record.builder()
                 .id(908L)
                 .label("salary")
+                .date(testDate)
+                .account(account)
                 .build();
         Category food = new Category(
                 9L,

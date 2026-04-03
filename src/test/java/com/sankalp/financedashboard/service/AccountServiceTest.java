@@ -168,6 +168,9 @@ class AccountServiceTest {
                 .name("Savings")
                 .records(new ArrayList<>())
                 .currency("USD")
+                .balance(0.0)
+                .color("#6290ff")
+                .icon("mdi-cash")
                 .includeInStatistic(true)
                 .user(user)
                 .build();
@@ -301,6 +304,9 @@ class AccountServiceTest {
                 .name("Savings")
                 .records(new ArrayList<>())
                 .currency("USD")
+                .balance(0.0)
+                .color("#6290ff")
+                .icon("mdi-cash")
                 .includeInStatistic(true)
                 .user(user)
                 .build();

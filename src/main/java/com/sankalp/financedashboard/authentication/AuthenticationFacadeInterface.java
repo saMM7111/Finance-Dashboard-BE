@@ -15,4 +15,10 @@ public interface AuthenticationFacadeInterface {
      * @return true if is admin, otherwise false
      */
     boolean isAdmin();
+
+    /**
+     * check if logged user is analyst
+     * @return true if is analyst, otherwise false
+     */
+    boolean isAnalyst();
 }

@@ -22,6 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -169,7 +170,11 @@ class UserServiceTest {
         Double expenses = -253.9;
         Double totalBalance = 9000.02;
         Account account = Account.builder()
+                .name("Current")
                 .currency(currency)
+                .balance(0.0)
+                .color("#6290ff")
+                .icon("mdi-cash")
                 .build();
         given(recordRepository.getTotalIncomes(eq(userId), eq(from), any()))
                 .willReturn(income);
@@ -276,6 +281,8 @@ class UserServiceTest {
                                         .name("Current")
                                         .currency("EUR")
                                         .balance(999.44)
+                                        .color("#6290ff")
+                                        .icon("mdi-cash")
                                         .includeInStatistic(true)
                                         .build(),
                                 Account.builder()
@@ -283,6 +290,8 @@ class UserServiceTest {
                                         .name("Savings")
                                         .currency("EUR")
                                         .balance(1000000.0)
+                                        .color("#6290ff")
+                                        .icon("mdi-cash")
                                         .includeInStatistic(true)
                                         .build()
                         ),
@@ -326,5 +335,56 @@ class UserServiceTest {
 
         // then
         assertThat(userDtos).isEqualTo(resultUserDtos);
+    }
+
+    // --- ANALYST role tests ---
+
+    @Test
+    void updateUserSetAnalystRoleRequiresAdmin() throws UserNotFoundException {
+        // given - a regular USER tries to set role to ANALYST
+        Long id = 9809809L;
+        User user = new User(
+                id, "John", "Doe", "john.doe@gmail.com", "secret",
+                Role.USER, new ArrayList<>(), "USD"
+        );
+        UpdateUserRequest updateRequest = UpdateUserRequest.builder()
+                .role(Role.ANALYST)
+                .build();
+
+        given(userRepository.findById(id))
+                .willReturn(Optional.of(user));
+        doThrow(new org.springframework.security.access.AccessDeniedException("Admin ROLE required."))
+                .when(authenticationService).ifNotAdminThrowAccessDenied();
+
+        // then
+        assertThatThrownBy(() -> userService.update(id, updateRequest))
+                .isInstanceOf(org.springframework.security.access.AccessDeniedException.class)
+                .hasMessageContaining("Admin ROLE required.");
+    }
+
+    @Test
+    void getTotalAnalyticUsesAnalystAwareCheck() throws UserNotFoundException {
+        // given
+        Long userId = 1L;
+        Date from = new Date();
+        Date to = new Date();
+        Account account = Account.builder()
+                .name("Current")
+                .currency("USD")
+                .balance(0.0)
+                .color("#6290ff")
+                .icon("mdi-cash")
+                .build();
+        given(recordRepository.getTotalIncomes(any(), any(), any())).willReturn(100.0);
+        given(recordRepository.getTotalExpenses(any(), any(), any())).willReturn(-50.0);
+        given(accountRepository.findAll()).willReturn(List.of(account));
+        given(accountRepository.getTotalBalance(userId)).willReturn(1000.0);
+
+        // when
+        userService.getTotalAnalytic(userId, from, to);
+
+        // then - verify the analyst-aware method is called
+        verify(authenticationService, org.mockito.Mockito.times(2))
+                .ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
     }
 }

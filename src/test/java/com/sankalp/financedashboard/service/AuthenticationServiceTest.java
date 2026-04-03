@@ -79,6 +79,7 @@ class AuthenticationServiceTest {
                 .firstName("John")
                 .lastName("Doe")
                 .role(Role.USER)
+                .active(true)
                 .currency("EUR")
                 .accountIds(new ArrayList<>())
                 .build();
@@ -118,6 +119,7 @@ class AuthenticationServiceTest {
                 .firstName("John")
                 .lastName("Doe")
                 .role(Role.USER)
+                .active(true)
                 .currency("EUR")
                 .accountIds(new ArrayList<>())
                 .build();
@@ -346,5 +348,139 @@ class AuthenticationServiceTest {
         assertThatThrownBy(() -> authenticationService.ifNotAdminThrowAccessDenied())
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("Admin ROLE required.");
+    }
+
+    @Test
+    void isAnalyst() {
+        // given
+        boolean isAnalyst = true;
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(isAnalyst);
+
+        // when
+        boolean result = authenticationService.isAnalyst();
+
+        // then
+        assertThat(result).isEqualTo(isAnalyst);
+    }
+
+    @Test
+    void isAnalystFalse() {
+        // given
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(false);
+
+        // when
+        boolean result = authenticationService.isAnalyst();
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void ifNotAdminOrAnalystThrowAccessDeniedAsAnalyst() {
+        // given - user is analyst, not admin
+        given(authenticationFacadeInterface.isAdmin())
+                .willReturn(false);
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(true);
+
+        // when - should not throw
+        authenticationService.ifNotAdminOrAnalystThrowAccessDenied();
+    }
+
+    @Test
+    void ifNotAdminOrAnalystThrowAccessDeniedAsAdmin() {
+        // given - user is admin
+        given(authenticationFacadeInterface.isAdmin())
+                .willReturn(true);
+
+        // when - should not throw
+        authenticationService.ifNotAdminOrAnalystThrowAccessDenied();
+    }
+
+    @Test
+    void ifNotAdminOrAnalystThrowAccessDeniedAsUser() {
+        // given - user is neither admin nor analyst
+        given(authenticationFacadeInterface.isAdmin())
+                .willReturn(false);
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(false);
+
+        // then
+        assertThatThrownBy(() -> authenticationService.ifNotAdminOrAnalystThrowAccessDenied())
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Admin or Analyst ROLE required.");
+    }
+
+    @Test
+    void ifNotAdminOrAnalystOrSelfRequestAsAnalyst() throws UserNotFoundException {
+        // given - user is analyst (not admin, not self)
+        Long userId = 999L;
+        given(authenticationFacadeInterface.isAdmin())
+                .willReturn(false);
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(true);
+
+        // when - should not throw since analyst bypasses ownership check
+        authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
+    }
+
+    @Test
+    void ifNotAdminOrAnalystOrSelfRequestAsUserNotSelf() {
+        // given - user is regular USER, not self
+        Long userId = 443L;
+        String email = "john.doe@yahoo.com";
+        User user = User.builder()
+                .id(4L)
+                .email(email)
+                .firstName("John")
+                .lastName("Doe")
+                .role(Role.USER)
+                .currency("EUR")
+                .build();
+
+        Authentication authentication = new Authentication() {
+            @Override
+            public String getName() { return "differentemail@email.cz"; }
+            @Override
+            public Collection<? extends GrantedAuthority> getAuthorities() { return null; }
+            @Override
+            public Object getCredentials() { return null; }
+            @Override
+            public Object getDetails() { return null; }
+            @Override
+            public Object getPrincipal() { return null; }
+            @Override
+            public boolean isAuthenticated() { return false; }
+            @Override
+            public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {}
+        };
+
+        given(userRepository.findById(userId))
+                .willReturn(Optional.of(user));
+        given(authenticationFacadeInterface.getAuthentication())
+                .willReturn(authentication);
+        given(authenticationFacadeInterface.isAdmin())
+                .willReturn(false);
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(false);
+
+        // then
+        assertThatThrownBy(() -> authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void ifNotAdminOrSelfRequestThrowAccessDeniedAsAnalyst() {
+        // given - analyst must not pass admin-or-self checks used for management/write operations
+        Long userId = 443L;
+        given(authenticationFacadeInterface.isAnalyst())
+                .willReturn(true);
+
+        // then
+        assertThatThrownBy(() -> authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(userId))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Access denied.");
     }
 }

@@ -30,6 +30,28 @@ public class UpdateUserRequest {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private Boolean active;
+
     @Size(max = 40)
     private String currency;
+
+    /**
+     * Backward-compatible constructor used by existing tests and call sites.
+     */
+    public UpdateUserRequest(
+            Long id,
+            String firstName,
+            String lastName,
+            String email,
+            Role role,
+            String currency
+    ) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = role;
+        this.active = null;
+        this.currency = currency;
+    }
 }

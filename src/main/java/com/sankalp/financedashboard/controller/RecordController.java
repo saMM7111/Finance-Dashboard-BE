@@ -55,7 +55,7 @@ public class RecordController {
     private final RecordService recordService;
 
     /**
-     * Get record by id. Role ADMIN can access all records, role USER only theirs.
+     * Get record by id. Role ADMIN and ANALYST can access all records, role USER only theirs.
      * @param id record id
      * @return record of specified id
      * @throws RecordNotFoundException Record of specified id doesn't exist.
@@ -65,7 +65,7 @@ public class RecordController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Return record by id.",
-            description = "Role ADMIN can access all records, role USER only theirs"
+            description = "Role ADMIN and ANALYST can access all records, role USER only theirs"
     )
     public RecordDto getById(@PathVariable Long id) throws RecordNotFoundException, UserNotFoundException {
         return recordService.getById(id).dto();
@@ -83,7 +83,7 @@ public class RecordController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Return all records.",
-            description = "Role ADMIN can access all records, role USER only records from their accounts."
+            description = "Role ADMIN and ANALYST can access all records, role USER only records from their accounts."
     )
     public Page<RecordDto> getAllFilter(Pageable pageable, @RequestParam(required = false) Long userId, @And({
             @Spec( path = "label", params = "label", spec = LikeIgnoreCase.class),

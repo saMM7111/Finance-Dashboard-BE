@@ -148,7 +148,8 @@ public class CategoryController { //TODO add security
     }
 
     /**
-     * Get analytic of categories. Role ADMIN can access analytic of all users, role USER only of their accounts.
+     * Get analytic of categories. Role ADMIN and ANALYST can access analytic of all users,
+     * role USER only of their accounts.
      * @param userId user id (analytic of records of this user)
      * @param dateGe date greater or equal than (inclusive)
      * @param dateLt date lower than (exclusive)
@@ -159,7 +160,7 @@ public class CategoryController { //TODO add security
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Return analytic of all categories.",
-            description = "Role ADMIN can access analytic of all users, role USER only of their accounts."
+            description = "Role ADMIN and ANALYST can access analytic of all users, role USER only of their accounts."
     )
     public List<CategoryAnalyticDto> getCategoryAnalytic(
             @RequestParam Long userId,

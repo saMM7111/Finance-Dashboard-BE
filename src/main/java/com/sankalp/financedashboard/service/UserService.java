@@ -3,7 +3,6 @@ package com.sankalp.financedashboard.service;
 import com.sankalp.financedashboard.dto.user.UpdateUserRequest;
 import com.sankalp.financedashboard.dto.user.UserDto;
 import com.sankalp.financedashboard.entity.*;
-import com.sankalp.financedashboard.entity.*;
 import com.sankalp.financedashboard.error.exception.UserNotFoundException;
 import com.sankalp.financedashboard.repository.AccountRepository;
 import com.sankalp.financedashboard.repository.RecordRepository;
@@ -73,8 +72,8 @@ public class UserService {
     }
 
     /**
-     * Update user by id. Role ADMIN can update all users and can set role ADMIN to all users. Role USER can update
-     * only self and can't set role ADMIN.
+     * Update user by id. Role ADMIN can update all users and can set role ADMIN or ANALYST to all users.
+     * Role USER can update only self and can't set role ADMIN or ANALYST.
      * @param id user id
      * @param request user data (only fields, which will be changed)
      * @return updated user
@@ -97,10 +96,14 @@ public class UserService {
             optionalUser.get().setEmail(request.getEmail());
         }
         if (null != request.getRole()) {
-            if (request.getRole() == Role.ADMIN) {
+            if (request.getRole() == Role.ADMIN || request.getRole() == Role.ANALYST) {
                 authenticationService.ifNotAdminThrowAccessDenied();
             }
             optionalUser.get().setRole(request.getRole());
+        }
+        if (request.getActive() != null) {
+            authenticationService.ifNotAdminThrowAccessDenied();
+            optionalUser.get().setActive(request.getActive());
         }
         userRepository.save(optionalUser.get());
         return optionalUser.get();
@@ -108,7 +111,7 @@ public class UserService {
 
     /**
      * Get total analytics (from accounts included in statistics) (incomes, expenses, cash flow...) of user. Role ADMIN
-     * can access the analytics of all users, role USER only of their accounts.
+     * and ANALYST can access the analytics of all users, role USER only of their accounts.
      * @param userId user id
      * @param dateGe dateGe date greater or equal than (inclusive)
      * @param dateLt dateLt date lower than (exclusive)
@@ -116,7 +119,7 @@ public class UserService {
      * @throws UserNotFoundException User of specified id doesn't exist.
      */
     public TotalAnalytic getTotalAnalytic(Long userId, Date dateGe, Date dateLt) throws UserNotFoundException {
-        authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(userId);
+        authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
 
         Double totalIncomes = recordRepository.getTotalIncomes(userId, dateGe, dateLt);
         Double totalExpenses = recordRepository.getTotalExpenses(userId, dateGe, dateLt);
@@ -133,13 +136,14 @@ public class UserService {
 
     /**
      * Get total balance before date. Include only accounts, which are included in statistics.
+     * Role ADMIN and ANALYST can access any user's balance, role USER only their own.
      * @param userId user id
      * @param dateLt date lower than
      * @return total balance
      * @throws UserNotFoundException User of specified id doesn't exist.
      */
     public Double getTotalBalance(Long userId, Date dateLt) throws UserNotFoundException {
-        authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(userId);
+        authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
         Double totalBalance = accountRepository.getTotalBalance(userId); //not in date range
         if (dateLt != null) {
             Double totalIncomesAfterRange = recordRepository.getTotalIncomes(userId, dateLt, new Date());
@@ -151,7 +155,7 @@ public class UserService {
 
     /**
      * Get time series of balance evolution by user. Include only accounts, which are included in statistics. Role
-     * ADMIN can access the analytics of all users, role USER only of their accounts.
+     * ADMIN and ANALYST can access the analytics of all users, role USER only of their accounts.
      * @param userId user id
      * @param dateGe dateGe dateGe date greater or equal than (inclusive)
      * @param dateLt dateLt date lower than (exclusive)
@@ -159,7 +163,7 @@ public class UserService {
      * @throws UserNotFoundException User of specified id doesn't exist.
      */
     public List<TimeSeriesEntry> getBalanceEvolution(Long userId, Date dateGe, Date dateLt) throws UserNotFoundException {
-        authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(userId);
+        authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
 
         Double totalBalance = getTotalBalance(userId, dateLt);
         List<TimeSeriesEntry> balanceEvolution =  recordRepository.getSpendingEvolution(userId, dateGe, dateLt);

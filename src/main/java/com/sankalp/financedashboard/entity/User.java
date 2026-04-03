@@ -41,10 +41,37 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder.Default
+    private Boolean active = true;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts; //one user belongs to many accounts
 
     private String currency; //all accounts of user have to be in same currency in order to make statistics
+
+    /**
+     * Backward-compatible constructor used by existing tests and call sites.
+     */
+    public User(
+            Long id,
+            String firstName,
+            String lastName,
+            String email,
+            String password,
+            Role role,
+            List<Account> accounts,
+            String currency
+    ) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.active = true;
+        this.accounts = accounts;
+        this.currency = currency;
+    }
 
     public User(RegisterRequest request, PasswordEncoder passwordEncoder) {
         firstName = request.getFirstName();
@@ -52,6 +79,7 @@ public class User implements UserDetails {
         email = request.getEmail();
         password = passwordEncoder.encode(request.getPassword());
         role = Role.USER;
+        active = true;
         currency = request.getCurrency();
     }
 
@@ -79,6 +107,7 @@ public class User implements UserDetails {
                 .lastName(lastName)
                 .email(email)
                 .role(role)
+                .active(active)
                 .currency(currency)
                 .accountIds(accounts != null ? accounts.stream().map(Account::getId).toList() : new ArrayList<>())
                 .build();
@@ -120,6 +149,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return Boolean.TRUE.equals(active);
     }
 }

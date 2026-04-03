@@ -113,7 +113,8 @@ public class CategoryService {
     }
 
     /**
-     * Get analytic of categories. Role ADMIN can access analytic of all users, role USER only of their accounts.
+     * Get analytic of categories. Role ADMIN and ANALYST can access analytic of all users,
+     * role USER only of their accounts.
      * @param userId user id (analytic of records of this user)
      * @param dateGe date greater or equal than (inclusive)
      * @param dateLt date lower than (exclusive)
@@ -122,7 +123,7 @@ public class CategoryService {
      */
     public List<CategoryAnalytic> getCategoriesAnalytic(Long userId, Date dateGe, Date dateLt)
             throws UserNotFoundException {
-        authenticationService.ifNotAdminOrSelfRequestThrowAccessDenied(userId);
+        authenticationService.ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(userId);
         return categoryRepository.findCategoriesAnalytic(userId, dateGe, dateLt);
     }
 

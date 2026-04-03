@@ -93,13 +93,14 @@ public class AuthenticationService {
     }
 
     /**
-     * Check if authenticated user has role ADMIN or id corresponds to authenticate user.
+     * Check if authenticated user doesn't have role ADMIN and request is not self request,
+     * or if authenticated user has role ANALYST.
      * @param id id to check
-     * @return true if is ADMIN or id is same as id of authenticated user
+     * @return true when access should be denied
      * @throws UserNotFoundException User of specified id doesn't exist.
      */
     public boolean isNotAdminOrSelfRequest(Long id) throws UserNotFoundException {
-        return !authenticationFacadeInterface.isAdmin() && checkIfRequestingSelf(id) == null;
+        return isAnalyst() || (!authenticationFacadeInterface.isAdmin() && checkIfRequestingSelf(id) == null);
     }
 
     /**
@@ -122,11 +123,43 @@ public class AuthenticationService {
     }
 
     /**
+     * Return if authenticated user has role ANALYST.
+     * @return true if has, otherwise false
+     */
+    public boolean isAnalyst() {
+        return authenticationFacadeInterface.isAnalyst();
+    }
+
+    /**
      * If authenticated user hasn't role ADMIN, throw Access denied exception.
      */
     public void ifNotAdminThrowAccessDenied() {
         if (!isAdmin()) {
             throw new AccessDeniedException("Admin ROLE required.");
+        }
+    }
+
+    /**
+     * If authenticated user hasn't role ADMIN or ANALYST, throw Access denied exception.
+     */
+    public void ifNotAdminOrAnalystThrowAccessDenied() {
+        if (!isAdmin() && !isAnalyst()) {
+            throw new AccessDeniedException("Admin or Analyst ROLE required.");
+        }
+    }
+
+    /**
+     * If authenticated user hasn't role ADMIN, hasn't role ANALYST, and id doesn't correspond to
+     * authenticated user, throw Access denied exception.
+     * @param id id to check
+     * @throws UserNotFoundException .
+     */
+    public void ifNotAdminOrAnalystOrSelfRequestThrowAccessDenied(Long id) throws UserNotFoundException {
+        if (!isAdmin() && !isAnalyst()) {
+            // Neither admin nor analyst, so must be self
+            if (isNotAdminOrSelfRequest(id)) {
+                throw new AccessDeniedException("Access denied.");
+            }
         }
     }
 }

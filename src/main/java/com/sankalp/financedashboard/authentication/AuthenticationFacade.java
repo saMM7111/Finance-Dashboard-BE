@@ -26,4 +26,14 @@ public class AuthenticationFacade implements AuthenticationFacadeInterface {
         Authentication auth = getAuthentication();
         return auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Role.ADMIN.name()));
     }
+
+    /**
+     * check if logged user is analyst
+     * @return true if is analyst, otherwise false
+     */
+    @Override
+    public boolean isAnalyst() {
+        Authentication auth = getAuthentication();
+        return auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Role.ANALYST.name()));
+    }
 }
