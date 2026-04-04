@@ -14,7 +14,9 @@ public class FinanceDashboard {
     @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public String displayAppIsRunning() {
-        return "Server is running";
+        return "Server is running. Welcome to the Finance Dashboard API! " +
+                "Use the /api/auth endpoints to register and authenticate. " +
+                "Access the API documentation at /swagger-ui/index.html.";
     }
 
     public static void main(String[] args) {

@@ -89,8 +89,6 @@ public class ApplicationConfig {
                                         - ANALYST is read-only and cannot create, update, or delete users, accounts, records, or categories.
                                         - Authorities are stored as raw role names: ADMIN, ANALYST, USER.
                                         """)
-                             // .termsOfService("http://swagger.io/terms/")
-                             // .license(new License().name("Apache 2.0").url("http://springdoc.org"))
                 )
                 .components(new Components()
                         .addSecuritySchemes("bearer-key", new SecurityScheme()
